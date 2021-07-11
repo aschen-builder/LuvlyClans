@@ -1,14 +1,17 @@
-﻿# JotunnModStub
-Upon building for release, this README.md is copied from `ProjectRoot/Package/` into `ProjectRoot/` such that the readme is displayed when the project is viewed via github. Make sure to edit the README.md inside the package directory, and not the project root as your changes will be overwritten.
+﻿# LUVLY CLANS
 
-## Installation (manual)
+## PREREQS
 
+You must have BepInEx, Jotunn, and Ehanced Progress Tracker installed.
 
-## Features
+## INSTALLATION
 
+Both the client and the server need to have this mod installed. Simply install with your preferred mod manager, or manually download, unzip, and copy `LuvlyClans.dll` to `/BepInEx/plugins`.
 
-## Changelog
+## CONFIGURATION
 
+This mod relies on the Tribe configuration files of Enhanced Progress Tracker.
 
-## Known issues
-You can find the github at:
+You can view the configuration setup here:
+
+https://github.com/ASharpPen/Valheim.EnhancedProgressTracker#configuration
