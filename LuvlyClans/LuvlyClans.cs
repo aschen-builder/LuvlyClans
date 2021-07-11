@@ -20,8 +20,6 @@ namespace LuvlyClans
         public const string PluginName = "LuvlyClans";
         public const string PluginVersion = "0.0.1";
 
-        public string LuvsTribe;
-
         private void Awake()
     {
         // Do all your init stuff here
