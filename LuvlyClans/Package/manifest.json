@@ -5,6 +5,7 @@
   "website_url": "",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.601",
-    ""
+    "ValheimModding-Jotunn-2.1.3",
+    "ASharpPen-Enhanced_Progress_Tracker-1.0.1"
   ]
 }

@@ -9,7 +9,17 @@ namespace LuvlyClans.TribeManager
 {
     class TribeManager
     {
-        public bool IsSameTribeByPlayer(Player player1, Player player2)
+        internal Player player1;
+        internal Player player2;
+        public bool isSameTribe;
+
+        public TribeManager(Player player_1, Player player_2)
+        {
+            player1 = player_1;
+            player2 = player_2;
+            isSameTribe = IsSameTribeByPlayer();
+        }
+        public bool IsSameTribeByPlayer()
         {
             if(player1 is null || player2 is null )
             {

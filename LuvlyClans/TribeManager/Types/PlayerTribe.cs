@@ -18,7 +18,7 @@ namespace LuvlyClans.TribeManager.Types
         }
         public PlayerTribe(Player player)
         {
-            p_name = player.m_name;
+            p_name = player.GetPlayerName();
             tribe = TribeByPlayerName(p_name);
         }
 

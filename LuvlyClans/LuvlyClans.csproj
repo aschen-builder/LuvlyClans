@@ -80,11 +80,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Patches\ContainerPatches.cs" />
+    <Compile Include="Patches\DoorPatches.cs" />
+    <Compile Include="Patches\MinimapPatches.cs" />
+    <Compile Include="Patches\ShipControllsPatches.cs" />
+    <Compile Include="Patches\TeleportWorldPatches.cs" />
     <Compile Include="Properties\IgnoreAccessModifiers.cs" />
     <Compile Include="LuvlyClans.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TribeManager\TribeManager.cs" />
     <Compile Include="TribeManager\Types\PlayerTribe.cs" />
+    <Compile Include="Utils\Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -92,7 +98,6 @@
     <None Include="Package\README.md" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ConfigurationManager\" />
     <Folder Include="Package\plugins\" />
   </ItemGroup>
   <ItemGroup>

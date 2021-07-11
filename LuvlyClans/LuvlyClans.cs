@@ -8,6 +8,9 @@ using BepInEx;
 using UnityEngine;
 using BepInEx.Configuration;
 using Jotunn.Utils;
+using BepInEx.Bootstrap;
+using HarmonyLib;
+using LuvlyClans.Patches;
 
 namespace LuvlyClans
 {
@@ -20,15 +23,19 @@ namespace LuvlyClans
         public const string PluginName = "LuvlyClans";
         public const string PluginVersion = "0.0.1";
 
-        private void Awake()
-    {
-        // Do all your init stuff here
-        // Acceptable value ranges can be defined to allow configuration via a slider in the BepInEx ConfigurationManager: https://github.com/BepInEx/BepInEx.ConfigurationManager
-        Config.Bind<int>("Main Section", "Example configuration integer", 1, new ConfigDescription("This is an example config, using a range limitation for ConfigurationManager", new AcceptableValueRange<int>(0, 100)));
+        private readonly Harmony harmony = new Harmony(PluginGUID);
 
-        // Jotunn comes with its own Logger class to provide a consistent Log style for all mods using it
-        Jotunn.Logger.LogInfo("LuvlyClans Initialized");
-    }
+        private void Awake()
+        {
+            // Do all your init stuff here
+            // Acceptable value ranges can be defined to allow configuration via a slider in the BepInEx ConfigurationManager: https://github.com/BepInEx/BepInEx.ConfigurationManager
+            Config.Bind<int>("Main Section", "Example configuration integer", 1, new ConfigDescription("This is an example config, using a range limitation for ConfigurationManager", new AcceptableValueRange<int>(0, 100)));
+
+            // Jotunn comes with its own Logger class to provide a consistent Log style for all mods using it
+            Jotunn.Logger.LogInfo("LuvlyClans Initialized");
+
+            harmony.PatchAll(typeof(DoorPatches));
+        }
 
 #if DEBUG
         private void Update()
@@ -41,10 +48,6 @@ namespace LuvlyClans
                 {
                     return;
                 }
-
-                var tribe = "";
-                Valheim.EnhancedProgressTracker.Tribe.TribeHelper.TryGetPlayerTribe(player.m_name, out tribe);
-                Jotunn.Logger.LogInfo(tribe);
             }
         }
 #endif
