@@ -30,9 +30,6 @@ namespace LuvlyClans
 
         // Jotunn comes with its own Logger class to provide a consistent Log style for all mods using it
         Jotunn.Logger.LogInfo("LuvlyClans Initialized");
-
-        Valheim.EnhancedProgressTracker.Tribe.TribeHelper.TryGetPlayerTribe("luvsdev", out LuvsTribe);
-            Jotunn.Logger.LogInfo(LuvsTribe);
     }
 
 #if DEBUG
@@ -40,7 +37,16 @@ namespace LuvlyClans
         {
             if (Input.GetKeyDown(KeyCode.F6))
             { // Set a breakpoint here to break on F6 key press
-                Jotunn.Logger.LogInfo("F6 hit");
+                var player = Player.m_localPlayer;
+
+                if(player is null)
+                {
+                    return;
+                }
+
+                var tribe = "";
+                Valheim.EnhancedProgressTracker.Tribe.TribeHelper.TryGetPlayerTribe(player.m_name, out tribe);
+                Jotunn.Logger.LogInfo(tribe);
             }
         }
 #endif
