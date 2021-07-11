@@ -16,18 +16,23 @@ namespace LuvlyClans
   //[NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
   internal class LuvlyClans : BaseUnityPlugin
   {
-    public const string PluginGUID = "com.aschenbuilder.luvlyclans";
-    public const string PluginName = "LuvlyClans";
-    public const string PluginVersion = "0.0.1";
+        public const string PluginGUID = "com.aschenbuilder.luvlyclans";
+        public const string PluginName = "LuvlyClans";
+        public const string PluginVersion = "0.0.1";
 
-    private void Awake()
+        public string LuvsTribe;
+
+        private void Awake()
     {
-      // Do all your init stuff here
-      // Acceptable value ranges can be defined to allow configuration via a slider in the BepInEx ConfigurationManager: https://github.com/BepInEx/BepInEx.ConfigurationManager
-      Config.Bind<int>("Main Section", "Example configuration integer", 1, new ConfigDescription("This is an example config, using a range limitation for ConfigurationManager", new AcceptableValueRange<int>(0, 100)));
+        // Do all your init stuff here
+        // Acceptable value ranges can be defined to allow configuration via a slider in the BepInEx ConfigurationManager: https://github.com/BepInEx/BepInEx.ConfigurationManager
+        Config.Bind<int>("Main Section", "Example configuration integer", 1, new ConfigDescription("This is an example config, using a range limitation for ConfigurationManager", new AcceptableValueRange<int>(0, 100)));
 
-      // Jotunn comes with its own Logger class to provide a consistent Log style for all mods using it
-      Jotunn.Logger.LogInfo("ModStub has landed");
+        // Jotunn comes with its own Logger class to provide a consistent Log style for all mods using it
+        Jotunn.Logger.LogInfo("LuvlyClans Initialized");
+
+        Valheim.EnhancedProgressTracker.Tribe.TribeHelper.TryGetPlayerTribe("luvsdev", out LuvsTribe);
+            Jotunn.Logger.LogInfo(LuvsTribe);
     }
 
 #if DEBUG
@@ -35,6 +40,7 @@ namespace LuvlyClans
         {
             if (Input.GetKeyDown(KeyCode.F6))
             { // Set a breakpoint here to break on F6 key press
+                Jotunn.Logger.LogInfo("F6 hit");
             }
         }
 #endif
