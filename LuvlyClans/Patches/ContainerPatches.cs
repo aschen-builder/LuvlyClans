@@ -1,9 +1,4 @@
 ﻿using HarmonyLib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LuvlyClans.Patches
 {
@@ -12,7 +7,7 @@ namespace LuvlyClans.Patches
     {
         [HarmonyPatch(typeof(Container), "Interact")]
         [HarmonyPrefix]
-        public bool ContainerInteract(bool __result, Container __instance, Humanoid character)
+        public static bool ContainerInteract(bool __result, Container __instance, Humanoid character)
         {
             long characterOwner = character.GetOwner();
             long containerOwner = __instance.m_nview.GetZDO().m_owner;

@@ -1,7 +1,7 @@
 ﻿{
   "name": "LuvlyClans",
   "description": "Tribe/Clan functionality built on the back of EPT.",
-  "version_number": "0.0.2",
+  "version_number": "0.0.3",
   "website_url": "https://github.com/aschen-builder/LuvlyClans",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.601",

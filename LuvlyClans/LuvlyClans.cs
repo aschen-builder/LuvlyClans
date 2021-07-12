@@ -6,15 +6,12 @@
 
 using BepInEx;
 using UnityEngine;
-using BepInEx.Configuration;
-using Jotunn.Utils;
-using BepInEx.Bootstrap;
 using HarmonyLib;
 using LuvlyClans.Patches;
 
 namespace LuvlyClans
 {
-  [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
+    [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
   [BepInDependency(Jotunn.Main.ModGuid)]
   //[NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
   internal class LuvlyClans : BaseUnityPlugin
@@ -27,27 +24,23 @@ namespace LuvlyClans
 
         private void Awake()
         {
-            // Do all your init stuff here
-            // Acceptable value ranges can be defined to allow configuration via a slider in the BepInEx ConfigurationManager: https://github.com/BepInEx/BepInEx.ConfigurationManager
-            Config.Bind<int>("Main Section", "Example configuration integer", 1, new ConfigDescription("This is an example config, using a range limitation for ConfigurationManager", new AcceptableValueRange<int>(0, 100)));
-
-            // Jotunn comes with its own Logger class to provide a consistent Log style for all mods using it
             Jotunn.Logger.LogInfo("LuvlyClans Initialized");
 
+            Jotunn.Logger.LogInfo("Patching Clan Permissions");
+
             harmony.PatchAll(typeof(DoorPatches));
+            harmony.PatchAll(typeof(ContainerPatches));
+            harmony.PatchAll(typeof(ShipControllsPatches));
+            harmony.PatchAll(typeof(TeleportWorldPatches));
+            harmony.PatchAll(typeof(ZNetPatches));
         }
 
 #if DEBUG
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.F6))
-            { // Set a breakpoint here to break on F6 key press
-                var player = Player.m_localPlayer;
+            {
 
-                if(player is null)
-                {
-                    return;
-                }
             }
         }
 #endif

@@ -82,9 +82,9 @@
   <ItemGroup>
     <Compile Include="Patches\ContainerPatches.cs" />
     <Compile Include="Patches\DoorPatches.cs" />
-    <Compile Include="Patches\MinimapPatches.cs" />
     <Compile Include="Patches\ShipControllsPatches.cs" />
     <Compile Include="Patches\TeleportWorldPatches.cs" />
+    <Compile Include="Patches\ZNetPatches.cs" />
     <Compile Include="Properties\IgnoreAccessModifiers.cs" />
     <Compile Include="LuvlyClans.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
