@@ -10,6 +10,7 @@ A Valheim clans mod built on the back of Enhanced Progress Tracker. This mod all
   - [INSTALLATION](#installation)
   - [CONFIGURATION](#configuration)
   - [CHANGELOG](#changelog)
+    - [v0.0.5](#v005)
     - [v0.0.4](#v004)
 
 
@@ -57,6 +58,11 @@ You can view the configuration setup here:
 https://github.com/ASharpPen/Valheim.EnhancedProgressTracker#configuration
 
 ## CHANGELOG
+
+### v0.0.5
+- Realized I'm a fucking idiot
+- Refactored logic for determining piece ownership
+- Refactored and reduced Global Character/Player utils (still more to do, thanks ASharpPen you're a beast)
 ### v0.0.4
 - Fixed nullPointException on ShipControlls
 - Fixed TeleportWorld patches and added truthy logging
