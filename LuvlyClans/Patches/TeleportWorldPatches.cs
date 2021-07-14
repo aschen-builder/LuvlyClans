@@ -1,30 +1,46 @@
 ﻿using HarmonyLib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using LuvlyClans.Utils;
+using UnityEngine;
 
 namespace LuvlyClans.Patches
 {
     [HarmonyPatch]
-    public static class TeleportWorldPatches
+    class TeleportWorldPatches
     {
-        [HarmonyPatch(typeof(TeleportWorld), "Interact")]
+        [HarmonyPatch(typeof(TeleportWorldTrigger), "OnTriggerEnter")]
         [HarmonyPrefix]
-        public static bool TeleportWorldInteract(bool __result, TeleportWorld __instance, Humanoid character)
+        public static bool TeleportWorldOnTriggerEnter(TeleportWorldTrigger __instance, Collider collider)
         {
-            long characterOwner = character.GetOwner();
-            long portalOwner = __instance.m_nview.GetZDO().m_owner;
+            Player character = collider.GetComponent<Player>();
+            Piece piece = __instance.GetComponentInParent<Piece>();
 
-            Player characterPlayer = Utils.GetPlayerFromOwner(characterOwner);
-            Player portalPlayer = Utils.GetPlayerFromOwner(portalOwner);
+            if (piece && character)
+            {
+                Player characterPlayer = PlayerUtils.GetGlobalPlayerByZDOID(character.GetZDOID());
+                long characterPID = characterPlayer.GetPlayerID();
+                long doorPID = piece.GetCreator();
+                Player doorPlayer = Player.GetPlayer(doorPID);
 
-            TribeManager.TribeManager tm = new TribeManager.TribeManager(portalPlayer, characterPlayer);
+                if (!characterPlayer || !doorPlayer)
+                {
+                    return true;
+                }
 
-            Jotunn.Logger.LogWarning($"is Player[{characterPlayer.GetPlayerName()}] in the same tribe as Player[{portalPlayer.GetPlayerName()}] :: {tm.isSameTribe}");
+                if (characterPID == doorPID)
+                {
+                    return true;
+                }
 
-            return tm.isSameTribe;
+                TribeManager.TribeManager tm = new TribeManager.TribeManager(doorPlayer, characterPlayer);
+
+                if (!tm.isSameTribe)
+                {
+                    Jotunn.Logger.LogMessage($"Player[{characterPlayer.GetPlayerName()}] is not same clan as Player[{doorPlayer.GetPlayerName()}]");
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

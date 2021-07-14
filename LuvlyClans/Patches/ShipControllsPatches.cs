@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using LuvlyClans.Utils;
 
 namespace LuvlyClans.Patches
 {
@@ -9,8 +10,6 @@ namespace LuvlyClans.Patches
         [HarmonyPrefix]
         public static bool ShipControllsInteract(bool __result, ShipControlls __instance, Humanoid character)
         {
-            long characterOwner = character.GetOwner();
-
             Ship ship = __instance.GetShip();
 
             if (ship is null)
@@ -18,23 +17,35 @@ namespace LuvlyClans.Patches
                 return true;
             }
 
-            long shipOwner = ship.m_nview.GetZDO().m_owner;
+            Piece piece = ship.GetComponentInParent<Piece>();
 
-            Player characterPlayer = Utils.GetPlayerFromOwner(characterOwner);
-            Player shipPlayer = Utils.GetPlayerFromOwner(shipOwner);
-
-            bool isPlayerNull = characterPlayer is null || shipPlayer is null;
-
-            if (isPlayerNull)
+            if (piece && character)
             {
-                return true;
+                Player characterPlayer = PlayerUtils.GetGlobalPlayerByZDOID(character.GetZDOID());
+                long characterPID = characterPlayer.GetPlayerID();
+                long shipPID = piece.GetCreator();
+                Player shipPlayer = Player.GetPlayer(shipPID);
+
+                if (!characterPlayer || !shipPlayer)
+                {
+                    return true;
+                }
+
+                if (characterPID == shipPID)
+                {
+                    return true;
+                }
+
+                TribeManager.TribeManager tm = new TribeManager.TribeManager(shipPlayer, characterPlayer);
+
+                if (!tm.isSameTribe)
+                {
+                    Jotunn.Logger.LogMessage($"Player[{characterPlayer.GetPlayerName()}] is not same clan as Player[{shipPlayer.GetPlayerName()}]");
+                    return false;
+                }
             }
 
-            TribeManager.TribeManager tm = new TribeManager.TribeManager(shipPlayer, characterPlayer);
-
-            Jotunn.Logger.LogWarning($"is Player[{characterPlayer.GetPlayerName()}] in the same tribe as Player[{shipPlayer.GetPlayerName()}] :: {tm.isSameTribe}");
-
-            return tm.isSameTribe;
+            return true;
         }
     }
 }

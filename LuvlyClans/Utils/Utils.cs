@@ -4,23 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LuvlyClans
+namespace LuvlyClans.Utils
 {
-    class Utils
+    class PlayerUtils
     {
-        public static Player GetPlayerFromOwner(long owner)
+        public static Player GetGlobalPlayerByZDOID(ZDOID pz)
         {
-            List<Player> allPlayers = Player.GetAllPlayers();
+            return Player.GetAllPlayers().FirstOrDefault(p => p.GetZDOID() == pz);
+        }
+    }
 
-            foreach (Player player in allPlayers)
-            {
-                if (player.GetOwner() == owner)
-                {
-                    return player;
-                }
-            }
-
-            return null;
+    class CharacterUtils
+    {
+        public static Character GetGlobalCharacterByZDOID(ZDOID cz)
+        {
+            return Character.GetAllCharacters().FirstOrDefault(c => c.GetZDOID() == cz);
         }
     }
 }

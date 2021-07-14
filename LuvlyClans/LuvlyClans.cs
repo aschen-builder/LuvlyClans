@@ -11,7 +11,7 @@ using LuvlyClans.Patches;
 
 namespace LuvlyClans
 {
-    [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
+  [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
   [BepInDependency(Jotunn.Main.ModGuid)]
   //[NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
   internal class LuvlyClans : BaseUnityPlugin
@@ -33,6 +33,7 @@ namespace LuvlyClans
             harmony.PatchAll(typeof(ShipControllsPatches));
             harmony.PatchAll(typeof(TeleportWorldPatches));
             harmony.PatchAll(typeof(ZNetPatches));
+            harmony.PatchAll(typeof(CharacterPatches));
         }
 
 #if DEBUG

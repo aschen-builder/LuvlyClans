@@ -80,6 +80,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Patches\CharacterPatches.cs" />
     <Compile Include="Patches\ContainerPatches.cs" />
     <Compile Include="Patches\DoorPatches.cs" />
     <Compile Include="Patches\ShipControllsPatches.cs" />
