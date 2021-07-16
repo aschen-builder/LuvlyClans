@@ -20,8 +20,8 @@ namespace LuvlyClans
         public const string PluginVersion = "0.0.1";
 
         public static string ConfigPath = Paths.ConfigPath;
-        public const string ClansPath = "luvly.clans.json";
-        public const string BackupClansPath = "luvly.clans.old.json";
+        public const string ClansDBPath = "luvly.clans.json";
+        public const string BackupClansDBPath = "luvly.clans.old.json";
 
         private readonly Harmony harmony = new Harmony(PluginGUID);
 
