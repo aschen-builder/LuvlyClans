@@ -112,6 +112,9 @@
     <Compile Include="Properties\IgnoreAccessModifiers.cs" />
     <Compile Include="LuvlyClans.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Server\DB.cs" />
+    <Compile Include="Server\RPC.cs" />
+    <Compile Include="Server\Types\Clans.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -121,7 +124,6 @@
   <ItemGroup>
     <Folder Include="Client\" />
     <Folder Include="Package\plugins\" />
-    <Folder Include="Server\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Package\manifest.json" />
