@@ -1,43 +1,51 @@
-﻿using System.Collections.Generic;
-using HarmonyLib;
-using LuvlyClans.Utils;
-using static ZNet;
+﻿using HarmonyLib;
+using LuvlyClans.ClansUtils;
+using LuvlyClans.Types.Clans;
+using JZnet = Jotunn.ZNetExtension;
 
 namespace LuvlyClans.Patches
 {
     [HarmonyPatch]
-    class ZNetPatches
+    public class ZNetPatches
     {
-        [HarmonyPatch(typeof(ZNet), "GetOtherPublicPlayers")]
+        [HarmonyPatch(typeof(ZNet), "OnNewConnection")]
         [HarmonyPostfix]
-        public static void ZNetGetOtherPublicPlayers(ZNet __instance, List<PlayerInfo> playerList)
+        public static void ZNetOnNewConnection(ZNet __instance, ZNetPeer peer)
         {
-            foreach (PlayerInfo player in __instance.m_players)
+            if (JZnet.IsServerInstance(__instance))
             {
-                if (player.m_publicPosition)
+                /** 
+                 * probably need to load the clans db to a dict here, wait already done
+                 */
+                return;
+            }
+
+            if (JZnet.IsClientInstance(__instance))
+            {
+                /**
+                 * need to check the clans db to see if playerID has been set for this peer
+                 */
+
+                string playerName = Player.m_localPlayer.GetPlayerName();
+                long playerID = Player.m_localPlayer.GetPlayerID();
+
+                Member playerClanMember = ClanManager.GetClanMemberByPlayerName(playerName);
+
+                bool hasPlayerID = playerClanMember.m_playerID != 0;
+
+                if (hasPlayerID)
                 {
-                    ZDOID characterID = player.m_characterID;
-                    ZDOID instanceID = __instance.m_characterID;
-
-                    if (!characterID.IsNone() && !instanceID.IsNone())
+                    if (playerID != playerClanMember.m_playerID)
                     {
-                        Player characterPlayer = PlayerUtils.GetGlobalPlayerByZDOID(characterID);
-                        Player instancePlayer = PlayerUtils.GetGlobalPlayerByZDOID(instanceID);
-                        
-                        bool isPlayerNull = characterPlayer is null || instancePlayer is null;
-                        bool isSameCharacter = player.m_characterID == __instance.m_characterID;
-
-                        if (!isPlayerNull && !isSameCharacter)
-                        {
-                            TribeManager.TribeManager tm = new TribeManager.TribeManager(characterPlayer, instancePlayer);
-
-                            if (tm.isSameTribe)
-                            {
-                                playerList.Remove(player);
-                            }
-                        }
+                        playerClanMember.m_playerID = playerID;
                     }
+
+                    return;
                 }
+
+                playerClanMember.m_playerID = playerID;
+
+                return;
             }
         }
     }

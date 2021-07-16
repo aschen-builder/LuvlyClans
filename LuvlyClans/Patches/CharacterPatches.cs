@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using LuvlyClans.Utils;
 
 namespace LuvlyClans.Patches
 {
@@ -17,8 +16,8 @@ namespace LuvlyClans.Patches
                 return;
             }
 
-            Player attackerPlayer = PlayerUtils.GetGlobalPlayerByZDOID(attacker);
-            Player characterPlayer = PlayerUtils.GetGlobalPlayerByZDOID(__instance.GetZDOID());
+            Player attackerPlayer = new Player();
+            Player characterPlayer = new Player();
 
             bool attackerGate = attackerPlayer is null || !attackerPlayer.IsPlayer();
             bool characterGate = characterPlayer is null || !characterPlayer.IsPlayer();
@@ -28,9 +27,7 @@ namespace LuvlyClans.Patches
                 return;
             }
 
-            TribeManager.TribeManager tm = new TribeManager.TribeManager(characterPlayer, attackerPlayer);
-
-            if (tm.isSameTribe)
+            if (true)
             {
                 Jotunn.Logger.LogWarning($"Clan FF Protection Activating for Player[{attackerPlayer.GetPlayerName()}] attack on Player[{characterPlayer.GetPlayerName()}]");
                 hit.ApplyModifier(0);
