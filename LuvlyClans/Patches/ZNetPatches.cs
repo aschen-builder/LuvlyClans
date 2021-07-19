@@ -1,51 +1,33 @@
 ﻿using HarmonyLib;
-using LuvlyClans.ClansUtils;
-using LuvlyClans.Types.Clans;
-using JZnet = Jotunn.ZNetExtension;
+using Jotunn;
+using Log = Jotunn.Logger;
 
 namespace LuvlyClans.Patches
 {
     [HarmonyPatch]
     public class ZNetPatches
     {
-        [HarmonyPatch(typeof(ZNet), "OnNewConnection")]
+        [HarmonyPatch(typeof(ZNet), "RPC_PeerInfo")]
         [HarmonyPostfix]
-        public static void ZNetOnNewConnection(ZNet __instance, ZNetPeer peer)
+        public static void ZNetOnNewConnection(ZNet __instance, ZRpc rpc, ZPackage pkg)
         {
-            if (JZnet.IsServerInstance(__instance))
+            if (!ZNetExtension.IsServerInstance(__instance))
             {
-                /** 
-                 * probably need to load the clans db to a dict here, wait already done
-                 */
-                return;
-            }
+                ZPackage zpkg = new ZPackage();
 
-            if (JZnet.IsClientInstance(__instance))
-            {
-                /**
-                 * need to check the clans db to see if playerID has been set for this peer
-                 */
+                PlayerProfile p = Game.instance.GetPlayerProfile();
 
-                string playerName = Player.m_localPlayer.GetPlayerName();
-                long playerID = Player.m_localPlayer.GetPlayerID();
-
-                Member playerClanMember = ClanManager.GetClanMemberByPlayerName(playerName);
-
-                bool hasPlayerID = playerClanMember.m_playerID != 0;
-
-                if (hasPlayerID)
+                if (p != null)
                 {
-                    if (playerID != playerClanMember.m_playerID)
-                    {
-                        playerClanMember.m_playerID = playerID;
-                    }
+                    zpkg.Write(p.GetName());
+                    zpkg.Write(p.GetPlayerID());
 
+                    Log.LogInfo($"Client sending message to {__instance.m_routedRpc.GetServerPeerID()}");
+                    ZRoutedRpc.instance.InvokeRoutedRPC(ZRoutedRpc.instance.GetServerPeerID(), "RequestClans", new object[] { zpkg });
                     return;
                 }
 
-                playerClanMember.m_playerID = playerID;
-
-                return;
+                Log.LogWarning("Null player on attempt to request clans from server");
             }
         }
     }

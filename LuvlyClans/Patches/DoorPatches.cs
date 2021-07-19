@@ -4,29 +4,28 @@ using Log = Jotunn.Logger;
 namespace LuvlyClans.Patches
 {
     [HarmonyPatch]
-    public class ContainerPatches
+    public class DoorPatches
     {
-        [HarmonyPatch(typeof(Container), "Interact")]
+        [HarmonyPatch(typeof(Door), "Interact")]
         [HarmonyPrefix]
-        public static bool ContainerInteract(Container __instance, Humanoid character, bool hold)
+        public static bool DoorInteract(Door __instance, Humanoid character, bool hold)
         {
             if (hold)
             {
                 return false;
             }
 
-            if (__instance.m_checkGuardStone && !PrivateArea.CheckAccess(__instance.transform.position))
+            if (!__instance.CanInteract())
+            {
+                return false;
+            }
+
+            if (!PrivateArea.CheckAccess(__instance.transform.position))
             {
                 return true;
             }
 
-            if (!__instance.CheckAccess(Game.instance.GetPlayerProfile().GetPlayerID()))
-            {
-                character.Message(MessageHud.MessageType.Center, "$msg_cantopen");
-                return true;
-            }
-
-            Piece piece = __instance.m_piece;
+            Piece piece = __instance.GetComponent<Piece>();
 
             if (piece != null && piece.IsPlacedByPlayer() && character != null)
             {

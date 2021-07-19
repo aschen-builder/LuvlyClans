@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace LuvlyClans.Types.Clans
+﻿namespace LuvlyClans.Server.Types
 {
     public class Member
     {
