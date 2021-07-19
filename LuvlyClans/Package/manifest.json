@@ -1,11 +1,10 @@
 ﻿{
   "name": "LuvlyClans",
-  "description": "Tribe/Clan functionality built on the back of EPT.",
-  "version_number": "0.0.5",
+  "description": "BRODER CLANS",
+  "version_number": "0.1.1",
   "website_url": "https://github.com/aschen-builder/LuvlyClans",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.601",
-    "ValheimModding-Jotunn-2.1.3",
-    "ASharpPen-Enhanced_Progress_Tracker-1.0.1"
+    "ValheimModding-Jotunn-2.1.3"
   ]
 }
