@@ -372,4 +372,5 @@ FodyWeavers.xsd
 Environment.props
 
 # not the generated dll for thunderstore
-*/Package/plugins/*
+*/Package/LuvlyClans/*
+LuvlyClans/Package/mod.zip
