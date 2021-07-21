@@ -7,10 +7,12 @@ namespace LuvlyClans.Server.Redis
     public class RedisManager
     {
         private static RedisManager redisman;
-        public static ConnectionMultiplexer redis;
+        public static ConnectionMultiplexer redisdata;
+        public static ConnectionMultiplexer redissub;
 
         private static string instanceGUID = Guid.NewGuid().ToString();
-        private static string clientName = $"luvlyclans-server-{instanceGUID}";
+        private static string dataClientName = $"luvlyclans-data-{instanceGUID}";
+        private static string subClientName = $"luvlyclans-sub-{instanceGUID}";
 
         private static string host;
         private static int port;
@@ -19,7 +21,14 @@ namespace LuvlyClans.Server.Redis
 
         private RedisManager()
         {
-            Connect();
+            Log.LogInfo("Initializing Redis connection");
+
+            Connect(dataClientName);
+            Connect(subClientName);
+
+            Log.LogInfo("Subscribing to Redis sync channel");
+
+            SyncToSub();
         }
 
         public static RedisManager GetInstance()
@@ -34,10 +43,10 @@ namespace LuvlyClans.Server.Redis
 
         public IDatabase GetDatabase()
         {
-            return redis.GetDatabase();
+            return redisdata.GetDatabase();
         }
 
-        private static ConfigurationOptions Config()
+        private static ConfigurationOptions Config(string clientName)
         {
             host = LuvlyClans.m_redis_host.Value;
             port = LuvlyClans.m_redis_port.Value;
@@ -51,11 +60,10 @@ namespace LuvlyClans.Server.Redis
                     { host, port }
                 },
                 ClientName = clientName,
-                ChannelPrefix = "luvlyclans",
                 Password = pass
             };
 
-            if (db != -1)
+            if (db != -1 && clientName != subClientName)
             {
                 config.DefaultDatabase = db;
             }
@@ -63,15 +71,36 @@ namespace LuvlyClans.Server.Redis
             return config;
         }
 
-        private static void Connect()
+        private static void Connect(string clientName)
         {
             try
             {
-                redis = ConnectionMultiplexer.Connect(Config());
+                redisdata = ConnectionMultiplexer.Connect(Config(clientName));
             } catch (Exception e)
             {
-                Log.LogWarning($"Unable to connect to Redis: {e}");
+                Log.LogWarning($"Unable to connect to Redis client [{clientName}]: {e}");
             }
+        }
+
+        private static void SyncToSub()
+        {
+            if (redissub != null)
+            {
+                redissub.GetSubscriber().Subscribe("sync", (channel, message) => SubHandler(channel, message));
+            }
+        }
+
+        private static void SubHandler(RedisChannel channel, RedisValue message)
+        {
+            if (channel == "sync")
+            {
+                if (!message.IsNullOrEmpty)
+                {
+                    Log.LogInfo($"Received Redis sync message:: {message}");
+                }
+            }
+
+            return;
         }
     }
 }
