@@ -1,40 +1,56 @@
 ﻿// LuvlyClans
 // a Valheim mod skeleton using Jötunn
-// 
+//
 // File:    LuvlyClans.cs
 // Project: LuvlyClans
 
 using BepInEx;
+using BepInEx.Configuration;
 using HarmonyLib;
 using Jotunn;
-using LuvlyClans.Patches;
-using LuvlyClans.Server.Types;
-using LuvlyClans.Server;
-using Log = Jotunn.Logger;
-using JSON = SimpleJson.SimpleJson;
-using Jotunn.Utils;
-using BepInEx.Configuration;
 using Jotunn.Managers;
+using Jotunn.Utils;
+using LuvlyClans.Patches;
+using LuvlyClans.Server;
+using LuvlyClans.Server.Redis;
+using LuvlyClans.Server.Types;
+using StackExchange.Redis;
+using JSON = SimpleJson.SimpleJson;
+using Log = Jotunn.Logger;
 
 namespace LuvlyClans
 {
-  [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
-  [BepInDependency(Main.ModGuid)]
-  [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
-  internal class LuvlyClans : BaseUnityPlugin
-  {
+    [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
+    [BepInDependency(Main.ModGuid)]
+    [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
+    internal class LuvlyClans : BaseUnityPlugin
+    {
+        /** plugin config */
         public const string PluginGUID = "com.aschenbuilder.luvlyclans";
         public const string PluginName = "LuvlyClans";
         public const string PluginVersion = "0.0.1";
 
+        /** deprecated db file paths */
         public static string m_path_config = BepInEx.Paths.ConfigPath;
         public const string m_path_db = "luvly.clans.json";
         public const string m_path_db_backup = "luvly.clans.old.json";
-        private ConfigEntry<string> m_path_db_config;
 
+        /** redis config */
+        public static ConfigEntry<string> m_redis_host;
+        public static ConfigEntry<int> m_redis_port;
+        public static ConfigEntry<string> m_redis_pass;
+        public static ConfigEntry<int> m_redis_db;
+
+        /** redis global singleton */
+        public static RedisManager redisman = RedisManager.GetInstance();
+
+        public static IDatabase redisdb = redisman.GetDatabase();
+
+        /** game instance gates */
         public static bool m_is_server;
         public static bool m_is_client;
 
+        /** db/item instances */
         public static DB m_db_server;
         public static Clans m_clans_server;
         public static Clans m_clans_client;
@@ -68,11 +84,10 @@ namespace LuvlyClans
         {
             Config.SaveOnConfigSet = true;
 
-            m_path_db_config = Config.Bind(
-                "Server Config",
-                "DB_PATH",
-                m_path_config + m_path_db,
-                new ConfigDescription("absolute path to clans db", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
+            m_redis_host = Config.Bind("Redis Config", "HOST", "localhost", new ConfigDescription("hostname of Redis server", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
+            m_redis_port = Config.Bind("Redis Config", "PORT", 6379, new ConfigDescription("port of Redis server", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
+            m_redis_pass = Config.Bind("Redis Config", "PASSWORD", "password", new ConfigDescription("password of Redis server", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
+            m_redis_db = Config.Bind("Redis Config", "DB", -1, new ConfigDescription("db in Redis server", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
 
             SynchronizationManager.OnConfigurationSynchronized += (obj, attr) =>
             {
