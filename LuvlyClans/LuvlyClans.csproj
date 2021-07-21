@@ -144,7 +144,6 @@
     <Compile Include="LuvlyClans.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server\DB.cs" />
-    <Compile Include="Server\FileManager.cs" />
     <Compile Include="Server\RPC.cs" />
     <Compile Include="Server\ServerManager.cs" />
     <Compile Include="Server\Types\Clans.cs" />
