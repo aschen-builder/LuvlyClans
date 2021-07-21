@@ -48,7 +48,7 @@ namespace LuvlyClans.Server.Redis
 
         private static ConfigurationOptions Config(string clientName)
         {
-            host = LuvlyClans.m_redis_host.Value;
+            host = LuvlyClans.m_redis_host.Value == "localhost" ? "127.0.0.1" : LuvlyClans.m_redis_host.Value;
             port = LuvlyClans.m_redis_port.Value;
             pass = LuvlyClans.m_redis_pass.Value;
             db = LuvlyClans.m_redis_db.Value;
@@ -59,8 +59,11 @@ namespace LuvlyClans.Server.Redis
                 {
                     { host, port }
                 },
+                Password = pass,
                 ClientName = clientName,
-                Password = pass
+                AbortOnConnectFail = false,
+                ConnectTimeout = 10000,
+                SyncTimeout = 10000
             };
 
             if (db != -1 && clientName != subClientName)
@@ -76,6 +79,16 @@ namespace LuvlyClans.Server.Redis
             try
             {
                 redisdata = ConnectionMultiplexer.Connect(Config(clientName));
+
+                if (redisdata.IsConnecting)
+                {
+                    Log.LogInfo($"Connecting [{clientName}] to Redis DB");
+                }
+
+                if (redisdata.IsConnected)
+                {
+                    Log.LogInfo($"Connected [{clientName}] to Redis DB");
+                }
             } catch (Exception e)
             {
                 Log.LogWarning($"Unable to connect to Redis client [{clientName}]: {e}");
