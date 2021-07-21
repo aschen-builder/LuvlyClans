@@ -36,15 +36,14 @@ namespace LuvlyClans
         public const string m_path_db_backup = "luvly.clans.old.json";
 
         /** redis config */
+        public static ConfigEntry<bool> m_redis_enabled;
         public static ConfigEntry<string> m_redis_host;
         public static ConfigEntry<int> m_redis_port;
         public static ConfigEntry<string> m_redis_pass;
         public static ConfigEntry<int> m_redis_db;
 
         /** redis global singleton */
-        public static RedisManager redisman = RedisManager.GetInstance();
-
-        public static IDatabase redisdb = redisman.GetDatabase();
+        public static RedisManager redisman;
 
         /** game instance gates */
         public static bool m_is_server;
@@ -73,6 +72,8 @@ namespace LuvlyClans
             harmony.PatchAll(typeof(TeleportWorldPatches));
             harmony.PatchAll(typeof(CharacterPatches));
             harmony.PatchAll(typeof(EnemyHudPatches));
+
+            redisman = RedisManager.GetInstance();
         }
 
         private void Update()
@@ -80,14 +81,20 @@ namespace LuvlyClans
             return;
         }
 
-        public void CreateConfigValues()
+        private void RedisConfigValues()
         {
-            Config.SaveOnConfigSet = true;
-
+            m_redis_enabled = Config.Bind("Redis Config", "ENABLED", true, new ConfigDescription("enable Redis server for clan hosting", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
             m_redis_host = Config.Bind("Redis Config", "HOST", "localhost", new ConfigDescription("hostname of Redis server", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
             m_redis_port = Config.Bind("Redis Config", "PORT", 6379, new ConfigDescription("port of Redis server", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
             m_redis_pass = Config.Bind("Redis Config", "PASSWORD", "password", new ConfigDescription("password of Redis server", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
             m_redis_db = Config.Bind("Redis Config", "DB", -1, new ConfigDescription("db in Redis server", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
+        }
+
+        public void CreateConfigValues()
+        {
+            Config.SaveOnConfigSet = true;
+
+            RedisConfigValues();
 
             SynchronizationManager.OnConfigurationSynchronized += (obj, attr) =>
             {
