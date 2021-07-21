@@ -13,6 +13,8 @@ using LuvlyClans.Server;
 using Log = Jotunn.Logger;
 using JSON = SimpleJson.SimpleJson;
 using Jotunn.Utils;
+using BepInEx.Configuration;
+using Jotunn.Managers;
 
 namespace LuvlyClans
 {
@@ -28,6 +30,7 @@ namespace LuvlyClans
         public static string m_path_config = BepInEx.Paths.ConfigPath;
         public const string m_path_db = "luvly.clans.json";
         public const string m_path_db_backup = "luvly.clans.old.json";
+        private ConfigEntry<string> m_path_db_config;
 
         public static bool m_is_server;
         public static bool m_is_client;
@@ -41,17 +44,47 @@ namespace LuvlyClans
 
         private void Awake()
         {
+            CreateConfigValues();
+
             Log.LogInfo("Loading patches");
+
             harmony.PatchAll(typeof(GamePatches));
             harmony.PatchAll(typeof(ZNetPatches));
             harmony.PatchAll(typeof(DoorPatches));
             harmony.PatchAll(typeof(ContainerPatches));
             harmony.PatchAll(typeof(MinimapPatches));
+            harmony.PatchAll(typeof(ShipControllsPatches));
+            harmony.PatchAll(typeof(TeleportWorldPatches));
+            harmony.PatchAll(typeof(CharacterPatches));
+            harmony.PatchAll(typeof(EnemyHudPatches));
         }
 
         private void Update()
         {
             return;
+        }
+
+        public void CreateConfigValues()
+        {
+            Config.SaveOnConfigSet = true;
+
+            m_path_db_config = Config.Bind(
+                "Server Config",
+                "DB_PATH",
+                m_path_config + m_path_db,
+                new ConfigDescription("absolute path to clans db", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+            SynchronizationManager.OnConfigurationSynchronized += (obj, attr) =>
+            {
+                if (attr.InitialSynchronization)
+                {
+                    Log.LogMessage("Initial Config sync event received");
+                }
+                else
+                {
+                    Log.LogMessage("Config sync event received");
+                }
+            };
         }
 
         public static string GetServerClansJSON()

@@ -1,6 +1,8 @@
 ﻿using LuvlyClans.Server.Types;
 using System.IO;
+using StackExchange.Redis;
 using JSON = SimpleJson.SimpleJson;
+using Log = Jotunn.Logger;
 
 namespace LuvlyClans.Server
 {
@@ -11,6 +13,8 @@ namespace LuvlyClans.Server
 
         public static bool m_has_db;
         public static bool m_has_db_backup;
+
+        private static ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost:6379");
 
         public DB(string path, string path_backup = null)
         {
@@ -24,6 +28,17 @@ namespace LuvlyClans.Server
         public static bool Exists(string path = null)
         {
             return File.Exists(path == null ? m_path_db : path);
+        }
+
+        public static void ReadRedis()
+        {
+            IDatabase db = redis.GetDatabase();
+            string clans = db.StringGet("valheim_clans");
+
+            if (clans != null)
+            {
+                Log.LogInfo(clans);
+            }
         }
 
         public Clans Read()

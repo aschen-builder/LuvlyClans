@@ -1,7 +1,7 @@
 ﻿{
   "name": "LuvlyClans",
   "description": "BRODER CLANS",
-  "version_number": "0.1.1",
+  "version_number": "0.1.2",
   "website_url": "https://github.com/aschen-builder/LuvlyClans",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.601",

@@ -14,6 +14,8 @@ BE ROCK HARD, BRODER!
 - [CONFIGURATION](#configuration)
   - [SERVER](#server)
 - [CHANGELOG](#changelog)
+  - [v0.1.2](#v012)
+  - [v0.1.1](#v011)
   - [v0.1.0](#v010)
   - [v0.0.5](#v005)
   - [v0.0.4](#v004)
@@ -23,27 +25,27 @@ BE ROCK HARD, BRODER!
 #### In Release:
 - Door Access
 - Container Access
-- Minimap Public Pin Visibility
-
-
-#### In QA:
 - Portal Access
 - Ship Controlls Access
 - HoverName Hidden per Clan
 - Friendly Fire reduction per Clan
+- Minimap Public Pin Visibility
+
+
+#### In QA:
 - Multi-world db centralization (need feedback and cluster specs PLEASE FOR THE LOVE OF FREYA)
+- ABACL and Behavior Config (Server & Client versions)
+
 
 #### In Development:
-- ABACL and Behavior Config (Server & Client versions)
 - Clan Management GUI
 - Redis integration
-
+- Clan Ranks
+- Clan Game Chat
 
 #### In Backlog:
 - Clan Skill Tree
 - Clan Items
-- Clan Game Chat
-- Clan Ranks
 
 
 ## Dependencies
@@ -74,11 +76,13 @@ In the config directory, create a file named `luvly.clans.json`. Use the followi
         {
           "m_playerName": "Luvsdev",
           "m_playerSID": 76561198064558302,
+          "m_playerID": 0,
           "m_playerRank": 4
         },
         {
           "m_playerName": "Notchar",
           "m_playerSID": 76561198060094387,
+          "m_playerID": 0,
           "m_playerRank": 4
         },
       ]
@@ -89,6 +93,7 @@ In the config directory, create a file named `luvly.clans.json`. Use the followi
         {
           "m_playerName": "Pissyamuro",
           "m_playerSID": 76561198132416693,
+          "m_playerID": 0,
           "m_playerRank": 4
         }
       ]
@@ -105,6 +110,12 @@ The Wildlings clan is the default "solo-player" clan and will have future featur
 
 ## CHANGELOG
 
+### v0.1.2
+- Released Portal and Ship Controll (I know, I know) access
+- Released hide hover name on non-clan basis
+- Released no damage to clan mates with PvP enabled
+### v0.1.1
+- Manifest changes
 ### v0.1.0
 - Bigger and badder, babbyyy!
 - Rebuilt the entire thing to account for offline/non-region players

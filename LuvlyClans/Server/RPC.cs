@@ -43,6 +43,14 @@ namespace LuvlyClans.Server
                     {
                         Log.LogWarning($"Player [{peerPlayerName}::{peerPlayerID}] does not exist in clans DB, adding to Wildlings");
 
+                        Member nw = new Member();
+                        nw.m_playerName = peerPlayerName;
+                        nw.m_playerID = peerPlayerID;
+
+                        ClansHelper.ClansHelper.CreateWildling(peerPlayerName, peerPlayerID);
+
+                        syncFlag = true;
+
                         Log.LogInfo("Writing updated clans to db");
                         DB.Write(LuvlyClans.GetServerClansJSON());
                     }

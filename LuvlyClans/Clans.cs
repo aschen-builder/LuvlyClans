@@ -1,5 +1,6 @@
 ﻿using LuvlyClans.Server.Types;
 using System;
+using System.Collections.Generic;
 using Log = Jotunn.Logger;
 
 namespace ClansHelper
@@ -65,6 +66,19 @@ namespace ClansHelper
             return null;
         }
 
+        public static Clan GetClanByClanName(string clanName, bool isClient)
+        {
+            Clans clans = isClient ? LuvlyClans.LuvlyClans.m_clans_client : LuvlyClans.LuvlyClans.m_clans_server;
+            bool hasClans = isClient ? m_has_clans_client : m_has_clans_server;
+
+            if (hasClans)
+            {
+                return Array.Find(clans.m_clans, (Clan c) => c.m_clanName == clanName);
+            }
+
+            return null;
+        }
+
         public static string GetClanNameByPlayerID(long playerID, bool isClient)
         {
             bool hasClans = isClient ? m_has_clans_client : m_has_clans_server;
@@ -111,6 +125,71 @@ namespace ClansHelper
             }
 
             return true;
+        }
+
+        public static Member BuildMember(string playerName, long playerID)
+        {
+            Member nm = new Member();
+
+            nm.m_playerName = playerName;
+            nm.m_playerID = playerID;
+
+            return nm;
+        }
+
+        public static Clan BuildClan(string clanName, Member[] clanMembers)
+        {
+            Clan nc = new Clan();
+
+            nc.m_clanName = clanName;
+            nc.m_members = clanMembers;
+
+            return nc;
+        }
+
+        public static void AddClanMember(Clan clan, Member member)
+        {
+            List<Member> newMembers = new List<Member>();
+
+            foreach (Member m in clan.m_members)
+            {
+                newMembers.Add(m);
+            }
+
+            newMembers.Add(member);
+
+            clan.m_members = newMembers.ToArray();
+        }
+
+        public static void AddClan(Clans clans, Clan clan)
+        {
+            List<Clan> newClans = new List<Clan>();
+
+            foreach (Clan c in clans.m_clans)
+            {
+                newClans.Add(c);
+            }
+
+            newClans.Add(clan);
+
+            clans.m_clans = newClans.ToArray();
+        }
+
+        public static void CreateWildling(string playerName, long playerID)
+        {
+            Clan wildlings = GetClanByClanName("Wildlings", true);
+
+            Member member = BuildMember(playerName, playerID);
+
+            if (wildlings == null)
+            {
+                Clan newWildlings = BuildClan("Wildlings", new Member[] { member });
+
+                AddClan(LuvlyClans.LuvlyClans.m_clans_server, newWildlings);
+            } else
+            {
+                AddClanMember(wildlings, member);
+            }
         }
     }
 }
