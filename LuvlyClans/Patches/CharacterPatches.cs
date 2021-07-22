@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using Log = Jotunn.Logger;
 
 namespace LuvlyClans.Patches
 {
@@ -17,7 +16,7 @@ namespace LuvlyClans.Patches
 
                 if (victim && attacker)
                 {
-                    bool canDamage = !ClansHelper.ClansHelper.IsSameClanByPlayerName(victim.GetPlayerName(), attacker.GetPlayerName(), true);
+                    bool canDamage = !LuvlyClans.clansman.IsSameClanByClanMemberName(victim.GetPlayerName(), attacker.GetPlayerName());
 
                     if (!canDamage)
                     {

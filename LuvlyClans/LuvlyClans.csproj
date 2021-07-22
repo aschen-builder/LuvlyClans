@@ -129,7 +129,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Clans.cs" />
+    <Compile Include="ClansManager.cs" />
     <Compile Include="Client\RPC.cs" />
     <Compile Include="Patches\CharacterPatches.cs" />
     <Compile Include="Patches\ContainerPatches.cs" />
@@ -143,11 +143,9 @@
     <Compile Include="Properties\IgnoreAccessModifiers.cs" />
     <Compile Include="LuvlyClans.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Server\DB.cs" />
     <Compile Include="Server\RedisManager.cs" />
     <Compile Include="Server\RPC.cs" />
-    <Compile Include="Server\ServerManager.cs" />
-    <Compile Include="Server\Types\Clans.cs" />
+    <Compile Include="Types\Clans.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

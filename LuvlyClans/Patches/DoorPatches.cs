@@ -43,8 +43,7 @@ namespace LuvlyClans.Patches
                     return true;
                 }
 
-                bool isClient = LuvlyClans.m_is_client;
-                bool canInteract = ClansHelper.ClansHelper.IsSameClanByPlayerID(piece.GetCreator(), characterPlayer.GetPlayerID(), isClient);
+                bool canInteract = LuvlyClans.clansman.IsSameClanByClanMemberID(piece.GetCreator(), characterPlayer.GetPlayerID());
 
                 if (!canInteract)
                 {

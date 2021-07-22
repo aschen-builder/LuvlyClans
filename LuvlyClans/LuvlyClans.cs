@@ -11,11 +11,8 @@ using Jotunn;
 using Jotunn.Managers;
 using Jotunn.Utils;
 using LuvlyClans.Patches;
-using LuvlyClans.Server;
 using LuvlyClans.Server.Redis;
-using LuvlyClans.Server.Types;
-using StackExchange.Redis;
-using JSON = SimpleJson.SimpleJson;
+using System;
 using Log = Jotunn.Logger;
 
 namespace LuvlyClans
@@ -31,36 +28,39 @@ namespace LuvlyClans
         public const string PluginVersion = "0.0.1";
 
         /** deprecated db file paths */
-        public static string m_path_config = BepInEx.Paths.ConfigPath;
-        public const string m_path_db = "luvly.clans.json";
-        public const string m_path_db_backup = "luvly.clans.old.json";
+        public static string pathBepinex = BepInEx.Paths.ConfigPath;
+        public const string pathJSON = "luvly.clans.json";
+        public const string pathJSONBackup = "luvly.clans.old.json";
 
         /** redis config */
-        public static ConfigEntry<bool> m_redis_enabled;
-        public static ConfigEntry<string> m_redis_host;
-        public static ConfigEntry<int> m_redis_port;
-        public static ConfigEntry<string> m_redis_pass;
-        public static ConfigEntry<int> m_redis_db;
+        public static ConfigEntry<bool> redisEnabled;
+        public static ConfigEntry<string> redisHost;
+        public static ConfigEntry<int> redisPort;
+        public static ConfigEntry<string> redisPass;
+        public static ConfigEntry<int> redisDB;
 
         /** redis global singleton */
         public static RedisManager redisman;
 
-        /** game instance gates */
-        public static bool m_is_server;
-        public static bool m_is_client;
+        /** clans manager global singleton */
+        public static ClansManager clansman;
 
-        /** db/item instances */
-        public static DB m_db_server;
-        public static Clans m_clans_server;
-        public static Clans m_clans_client;
-        public static Clans m_clans_db;
+        /** game instance gates */
+        public static bool isServer;
+        public static bool isClient;
 
         private readonly Harmony harmony = new Harmony(PluginGUID);
 
         private void Awake()
         {
             CreateConfigValues();
+            LoadPatches();
+        }
 
+        private void Update() { }
+
+        private void LoadPatches()
+        {
             Log.LogInfo("Loading patches");
 
             harmony.PatchAll(typeof(GamePatches));
@@ -72,26 +72,21 @@ namespace LuvlyClans
             harmony.PatchAll(typeof(TeleportWorldPatches));
             harmony.PatchAll(typeof(CharacterPatches));
             harmony.PatchAll(typeof(EnemyHudPatches));
-
-            redisman = RedisManager.GetInstance();
-        }
-
-        private void Update()
-        {
-            return;
         }
 
         private void RedisConfigValues()
         {
-            m_redis_enabled = Config.Bind("Redis Config", "ENABLED", true, new ConfigDescription("enable Redis server for clan hosting", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
-            m_redis_host = Config.Bind("Redis Config", "HOST", "localhost", new ConfigDescription("hostname of Redis server", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
-            m_redis_port = Config.Bind("Redis Config", "PORT", 6379, new ConfigDescription("port of Redis server", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
-            m_redis_pass = Config.Bind("Redis Config", "PASSWORD", "password", new ConfigDescription("password of Redis server", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
-            m_redis_db = Config.Bind("Redis Config", "DB", -1, new ConfigDescription("db in Redis server", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
+            redisEnabled = Config.Bind("Redis Config", "ENABLED", true, new ConfigDescription("enable Redis server for clan hosting", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
+            redisHost = Config.Bind("Redis Config", "HOST", "localhost", new ConfigDescription("hostname of Redis server", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
+            redisPort = Config.Bind("Redis Config", "PORT", 6379, new ConfigDescription("port of Redis server", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
+            redisPass = Config.Bind("Redis Config", "PASSWORD", "password", new ConfigDescription("password of Redis server", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
+            redisDB = Config.Bind("Redis Config", "DB", -1, new ConfigDescription("db in Redis server", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
         }
 
-        public void CreateConfigValues()
+        private void CreateConfigValues()
         {
+            Log.LogInfo("Initializing config");
+
             Config.SaveOnConfigSet = true;
 
             RedisConfigValues();
@@ -108,10 +103,13 @@ namespace LuvlyClans
                 }
             };
         }
-
-        public static string GetServerClansJSON()
+        public static long LongRandom(long min, long max, Random rand)
         {
-            return JSON.SerializeObject(m_clans_server);
+            byte[] buf = new byte[8];
+            rand.NextBytes(buf);
+            long longRand = BitConverter.ToInt64(buf, 0);
+
+            return (Math.Abs(longRand % (max - min)) + min);
         }
     }
 }

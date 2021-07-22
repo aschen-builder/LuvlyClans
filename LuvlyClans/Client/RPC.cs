@@ -1,4 +1,4 @@
-﻿using LuvlyClans.Server.Types;
+﻿using LuvlyClans.Types;
 using Log = Jotunn.Logger;
 using JSON = SimpleJson.SimpleJson;
 
@@ -21,8 +21,11 @@ namespace LuvlyClans.Client
 
                 if (msg != null && msg != "" && msg != "no peer")
                 {
-                    Log.LogInfo("Received Clans from server");
-                    LuvlyClans.m_clans_client = JSON.DeserializeObject<Clans>(msg);
+                    Log.LogInfo("Client received clans string from Server");
+
+                    LuvlyClans.clansman.clientString = msg;
+                    LuvlyClans.clansman.GetClientClans();
+
                     return;
                 }
 
@@ -45,7 +48,6 @@ namespace LuvlyClans.Client
                 if (msg != null && msg != "")
                 {
                     Log.LogWarning($"Received {msg} from server");
-                    Chat.instance.AddString("Server", "<color=\"red\">" + msg + "</color>", Talker.Type.Normal);
                 }
             }
         }

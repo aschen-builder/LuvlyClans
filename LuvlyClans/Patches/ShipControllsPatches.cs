@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using Log = Jotunn.Logger;
 
 namespace LuvlyClans.Patches
 {
@@ -21,7 +20,7 @@ namespace LuvlyClans.Patches
                 {
                     if (player.GetPlayerID() == shipPiece.GetCreator())
                     {
-                        bool canInteract = ClansHelper.ClansHelper.IsSameClanByPlayerID(shipPiece.GetCreator(), player.GetPlayerID(), true);
+                        bool canInteract = LuvlyClans.clansman.IsSameClanByClanMemberID(shipPiece.GetCreator(), player.GetPlayerID());
 
                         if (!canInteract)
                         {

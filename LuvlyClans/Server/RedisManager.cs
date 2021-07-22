@@ -7,12 +7,12 @@ namespace LuvlyClans.Server.Redis
     public class RedisManager
     {
         private static RedisManager redisman;
-        public static ConnectionMultiplexer redisdata;
-        public static ConnectionMultiplexer redissub;
+        public ConnectionMultiplexer redisdata;
+        public ConnectionMultiplexer redissub;
 
         private static string instanceGUID = Guid.NewGuid().ToString();
-        private static string dataClientName = $"luvlyclans-data-{instanceGUID}";
-        private static string subClientName = $"luvlyclans-sub-{instanceGUID}";
+        private string dataClientName = $"luvlyclans-data-{instanceGUID}";
+        private string subClientName = $"luvlyclans-sub-{instanceGUID}";
 
         private static string host;
         private static int port;
@@ -46,12 +46,12 @@ namespace LuvlyClans.Server.Redis
             return redisdata.GetDatabase();
         }
 
-        private static ConfigurationOptions Config(string clientName)
+        private ConfigurationOptions Config(string clientName)
         {
-            host = LuvlyClans.m_redis_host.Value == "localhost" ? "127.0.0.1" : LuvlyClans.m_redis_host.Value;
-            port = LuvlyClans.m_redis_port.Value;
-            pass = LuvlyClans.m_redis_pass.Value;
-            db = LuvlyClans.m_redis_db.Value;
+            host = LuvlyClans.redisHost.Value == "localhost" ? "127.0.0.1" : LuvlyClans.redisHost.Value;
+            port = LuvlyClans.redisPort.Value;
+            pass = LuvlyClans.redisPass.Value;
+            db = LuvlyClans.redisDB.Value;
 
             ConfigurationOptions config = new ConfigurationOptions
             {
@@ -74,7 +74,7 @@ namespace LuvlyClans.Server.Redis
             return config;
         }
 
-        private static void Connect(string clientName)
+        private void Connect(string clientName)
         {
             try
             {
@@ -95,7 +95,7 @@ namespace LuvlyClans.Server.Redis
             }
         }
 
-        private static void SyncToSub()
+        private void SyncToSub()
         {
             if (redissub != null)
             {
@@ -112,8 +112,6 @@ namespace LuvlyClans.Server.Redis
                     Log.LogInfo($"Received Redis sync message:: {message}");
                 }
             }
-
-            return;
         }
     }
 }

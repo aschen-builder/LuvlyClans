@@ -23,7 +23,7 @@ namespace LuvlyClans.Patches
 
 			foreach (ZNet.PlayerInfo tpi in __instance.m_tempPlayerInfo)
 			{
-				bool canSee = ClansHelper.ClansHelper.IsSameClanByPlayerName(tpi.m_name, player != null ? player.m_playerName : "", true);
+				bool canSee = LuvlyClans.clansman.IsSameClanByClanMemberName(tpi.m_name, player != null ? player.m_playerName : "");
 
 				if (canSee)
 				{
