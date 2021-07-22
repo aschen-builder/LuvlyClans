@@ -17,7 +17,7 @@ namespace LuvlyClans.Patches
 
                     if (piece)
                     {
-                        bool canInteract = ClansHelper.ClansHelper.IsSameClanByPlayerID(piece.GetCreator(), player.GetPlayerID(), true);
+                        bool canInteract = LuvlyClans.clansman.IsSameClanByClanMemberID(piece.GetCreator(), player.GetPlayerID());
 
                         if (!canInteract)
                         {

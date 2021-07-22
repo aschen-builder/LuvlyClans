@@ -25,7 +25,7 @@ namespace LuvlyClans.Patches
 					Player player = Player.m_localPlayer;
 					Player enemy = c as Player;
 
-					bool canSee = ClansHelper.ClansHelper.IsSameClanByPlayerName(player.GetPlayerName(), enemy.GetPlayerName(), true);
+					bool canSee = LuvlyClans.clansman.IsSameClanByClanMemberName(player.GetPlayerName(), enemy.GetPlayerName());
 
 					if (!canSee)
 					{

@@ -1,6 +1,6 @@
 ﻿using Log = Jotunn.Logger;
-using ClansHelper;
-using LuvlyClans.Server.Types;
+using LuvlyClans.Types;
+using System.Collections.Generic;
 
 namespace LuvlyClans.Server
 {
@@ -9,60 +9,78 @@ namespace LuvlyClans.Server
         public static void RPC_RequestClans(long sender, ZPackage pkg)
         {
             ZPackage zpkg = new ZPackage();
+            bool SYNC_FLAG = false; /** flag to sync all clients (including redis clients) */
 
             if (pkg != null && pkg.Size() > 0)
             {
-                Log.LogInfo("Receiving message from peer");
+                Log.LogInfo("Server received request from peer");
 
                 ZNetPeer peer = ZNet.instance.GetPeer(sender);
 
                 if (peer != null)
                 {
-                    Log.LogInfo("Received Clans data request from valid peer");
+                    Log.LogInfo("Server received clans data request from valid peer");
 
-                    string peerPlayerName = pkg.ReadString();
-                    long peerPlayerID = pkg.ReadLong();
+                    string playerName = pkg.ReadString();
+                    long playerID = pkg.ReadLong();
 
-                    Clan peerClan = ClansHelper.ClansHelper.GetClanByPlayerName(peerPlayerName, false);
-                    Member peerMember = ClansHelper.ClansHelper.GetClanMemberFromClanByPlayerName(peerClan, peerPlayerName);
+                    bool playerExistsByName = LuvlyClans.clansman.ClansHasClanMemberByName(playerName);
+                    bool playerExistsByID = LuvlyClans.clansman.ClansHasClanMemberByID(playerID);
 
-                    bool syncFlag = false;
-
-                    if (peerMember != null)
+                    if (!playerExistsByName)
                     {
-                        if (peerMember.m_playerID != peerPlayerID)
+                        Log.LogWarning($"Unable to find Player [{playerName}] in clans by name");
+
+                        ClanMember newMember = LuvlyClans.clansman.CreateClanMember(playerName, playerID);
+
+                        /** need to extract this following block to a method in clansman */
+                        Clan wildlings = LuvlyClans.clansman.GetClanByName("Wildlings");
+
+                        if (wildlings != null)
                         {
-                            Log.LogWarning($"Updating Player [{peerPlayerName}] with current playerID [{peerPlayerID}]");
-                            peerMember.m_playerID = peerPlayerID;
-                            syncFlag = true;
+                            List<ClanMember> membersList = new List<ClanMember>();
+
+                            for (int i = 0; i < wildlings.clanMembers.Length; i++)
+                            {
+                                membersList.Add(wildlings.clanMembers[i]);
+                            }
+
+                            membersList.Add(newMember);
+
+                            wildlings.clanMembers = membersList.ToArray();
+
+                            SYNC_FLAG = true;
                         }
 
-                        Log.LogInfo("Writing updated clans to db");
-                        DB.Write(LuvlyClans.GetServerClansJSON());
-                    } else
+                        Log.LogWarning($"Player [{playerName}] added to wildlings");
+                    }
+                    else
                     {
-                        Log.LogWarning($"Player [{peerPlayerName}::{peerPlayerID}] does not exist in clans DB, adding to Wildlings");
+                        if (!playerExistsByID)
+                        {
+                            Log.LogWarning($"Player [{playerName}] does not have PlayerID set");
 
-                        Member nw = new Member();
-                        nw.m_playerName = peerPlayerName;
-                        nw.m_playerID = peerPlayerID;
+                            ClanMember member = LuvlyClans.clansman.GetClanMemberByName(playerName);
 
-                        ClansHelper.ClansHelper.CreateWildling(peerPlayerName, peerPlayerID);
+                            member.playerID = playerID;
 
-                        syncFlag = true;
-
-                        Log.LogInfo("Writing updated clans to db");
-                        DB.Write(LuvlyClans.GetServerClansJSON());
+                            Log.LogWarning($"PlayerID now set for Player [{playerName}]");
+                        }
                     }
 
-                    zpkg.Write(LuvlyClans.GetServerClansJSON());
+                    if (SYNC_FLAG)
+                    {
+                        LuvlyClans.clansman.UpdateServerString();
+                    }
 
-                    ZRoutedRpc.instance.InvokeRoutedRPC(syncFlag ? 0L : sender, "ResponseClans", new object[] { zpkg });
+                    zpkg.Write(LuvlyClans.clansman.GetServerString());
+
+                    ZRoutedRpc.instance.InvokeRoutedRPC(SYNC_FLAG ? 0L : sender, "ResponseClans", new object[] { zpkg });
 
                     return;
                 }
 
-                Log.LogWarning("Result is no peer finding sender");
+                Log.LogWarning("Server was unable to find a peer from the sender");
 
                 zpkg.Write("no peer");
 

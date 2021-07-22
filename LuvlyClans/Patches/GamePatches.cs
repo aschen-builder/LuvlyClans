@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 using Jotunn;
-using LuvlyClans.Server;
+using LuvlyClans.Server.Redis;
 using System;
 using Log = Jotunn.Logger;
 
@@ -13,29 +13,32 @@ namespace LuvlyClans.Patches
         [HarmonyPrefix]
         public static void GameStart()
         {
-            LuvlyClans.m_is_server = ZNet.instance.IsServer() || ZNet.instance.IsDedicated() || ZNet.instance.IsLocalInstance();
-            LuvlyClans.m_is_client = ZNet.instance.IsClientInstance();
+            LuvlyClans.isServer = ZNet.instance.IsServer() || ZNet.instance.IsDedicated() || ZNet.instance.IsLocalInstance();
+            LuvlyClans.isClient = ZNet.instance.IsClientInstance();
 
-            if (LuvlyClans.m_is_server)
+            if (LuvlyClans.isServer)
             {
                 Log.LogInfo("Server instance found");
 
-                ServerManager.LoadClans();
+                LuvlyClans.redisman = RedisManager.GetInstance();
 
                 RegisterServerRPCs();
             }
 
-            if (LuvlyClans.m_is_client)
+            if (LuvlyClans.isClient)
             {
                 Log.LogInfo("Client instance found");
 
                 RegisterClientRPCs();
             }
+
+            LuvlyClans.clansman = ClansManager.GetInstance();
         }
 
         public static void RegisterServerRPCs()
         {
             Log.LogInfo("Registering Clans RPCs");
+
             ZRoutedRpc.instance.Register("RequestClans", new Action<long, ZPackage>(Server.RPC.RPC_RequestClans));
             ZRoutedRpc.instance.Register("ResponseClans", new Action<long, ZPackage>(Server.RPC.RPC_ResponseClans));
             ZRoutedRpc.instance.Register("BadMessage", new Action<long,ZPackage>(Server.RPC.RPC_BadRequest));
@@ -44,6 +47,7 @@ namespace LuvlyClans.Patches
         public static void RegisterClientRPCs()
         {
             Log.LogInfo("Registering Clans RPCs");
+
             ZRoutedRpc.instance.Register("RequestClans", new Action<long, ZPackage>(Client.RPC.RPC_RequestClans));
             ZRoutedRpc.instance.Register("ResponseClans", new Action<long, ZPackage>(Client.RPC.RPC_ResponseClans));
             ZRoutedRpc.instance.Register("BadMessage", new Action<long, ZPackage>(Client.RPC.RPC_BadRequest));
