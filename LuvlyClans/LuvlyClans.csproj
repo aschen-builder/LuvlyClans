@@ -130,6 +130,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Clans.cs" />
+    <Compile Include="Client\GUI\ClansMenu.cs" />
     <Compile Include="Client\RPC.cs" />
     <Compile Include="Patches\CharacterPatches.cs" />
     <Compile Include="Patches\ContainerPatches.cs" />

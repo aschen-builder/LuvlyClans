@@ -8,13 +8,15 @@ using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
 using Jotunn;
+using Jotunn.Configs;
 using Jotunn.Managers;
 using Jotunn.Utils;
 using LuvlyClans.Patches;
 using LuvlyClans.Server;
 using LuvlyClans.Server.Redis;
 using LuvlyClans.Server.Types;
-using StackExchange.Redis;
+using LuvlyClans.Client.GUI;
+using UnityEngine;
 using JSON = SimpleJson.SimpleJson;
 using Log = Jotunn.Logger;
 
@@ -55,11 +57,15 @@ namespace LuvlyClans
         public static Clans m_clans_client;
         public static Clans m_clans_db;
 
+        private ClansMenu clansMenu;
+
         private readonly Harmony harmony = new Harmony(PluginGUID);
 
         private void Awake()
         {
             CreateConfigValues();
+
+            clansMenu = new ClansMenu();
 
             Log.LogInfo("Loading patches");
 
@@ -73,18 +79,21 @@ namespace LuvlyClans
             harmony.PatchAll(typeof(CharacterPatches));
             harmony.PatchAll(typeof(EnemyHudPatches));
 
-            redisman = RedisManager.GetInstance();
+            //redisman = RedisManager.GetInstance();
         }
 
         private void Update()
         {
-            return;
+            if (ZInput.instance != null)
+            {
+                clansMenu.ToggleMenu();
+            }
         }
 
         private void RedisConfigValues()
         {
             m_redis_enabled = Config.Bind("Redis Config", "ENABLED", true, new ConfigDescription("enable Redis server for clan hosting", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
-            m_redis_host = Config.Bind("Redis Config", "HOST", "localhost", new ConfigDescription("hostname of Redis server", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
+            m_redis_host = Config.Bind("Redis Config", "HOST", "127.0.0.1", new ConfigDescription("hostname of Redis server", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
             m_redis_port = Config.Bind("Redis Config", "PORT", 6379, new ConfigDescription("port of Redis server", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
             m_redis_pass = Config.Bind("Redis Config", "PASSWORD", "password", new ConfigDescription("password of Redis server", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
             m_redis_db = Config.Bind("Redis Config", "DB", -1, new ConfigDescription("db in Redis server", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
