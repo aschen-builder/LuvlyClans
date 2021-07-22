@@ -63,15 +63,7 @@ namespace LuvlyClans
         {
             Log.LogInfo("Loading patches");
 
-            harmony.PatchAll(typeof(GamePatches));
-            harmony.PatchAll(typeof(ZNetPatches));
-            harmony.PatchAll(typeof(DoorPatches));
-            harmony.PatchAll(typeof(ContainerPatches));
-            harmony.PatchAll(typeof(MinimapPatches));
-            harmony.PatchAll(typeof(ShipControllsPatches));
-            harmony.PatchAll(typeof(TeleportWorldPatches));
-            harmony.PatchAll(typeof(CharacterPatches));
-            harmony.PatchAll(typeof(EnemyHudPatches));
+            harmony.PatchAll();
         }
 
         private void RedisConfigValues()

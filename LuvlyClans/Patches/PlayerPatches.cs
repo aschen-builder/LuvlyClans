@@ -26,17 +26,13 @@ namespace LuvlyClans.Patches
                     if (character != null)
                     {
                         SEMan seman = character.GetSEMan();
-                        StatusEffect se = new SE_Stats();
 
-                        float drain = 0.5f;
-                        float raise = 5f;
+                        if (seman != null)
+                        {
 
-                        se.ModifyRunStaminaDrain(0f, ref drain);
-                        se.ModifyRaiseSkill(Skills.SkillType.Run, ref raise);
+                        }
 
                         Log.LogInfo("Adding the Curse of the Wildlings");
-
-                        seman.AddStatusEffect(se);
                     }
                 }
             }
