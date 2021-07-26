@@ -16,6 +16,8 @@
 
         public long clanID { get; set; }
 
+        public bool isPublic { get; set; }
+
         public ClanMember[] clanMembers { get; set; }
     }
 

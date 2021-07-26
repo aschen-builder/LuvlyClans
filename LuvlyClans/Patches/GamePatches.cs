@@ -41,6 +41,7 @@ namespace LuvlyClans.Patches
 
             ZRoutedRpc.instance.Register("RequestClans", new Action<long, ZPackage>(Server.RPC.RPC_RequestClans));
             ZRoutedRpc.instance.Register("ResponseClans", new Action<long, ZPackage>(Server.RPC.RPC_ResponseClans));
+            ZRoutedRpc.instance.Register("UpdateClans", new Action<long, ZPackage>(Server.RPC.RPC_UpdateClans));
             ZRoutedRpc.instance.Register("BadMessage", new Action<long,ZPackage>(Server.RPC.RPC_BadRequest));
         }
 
@@ -50,6 +51,7 @@ namespace LuvlyClans.Patches
 
             ZRoutedRpc.instance.Register("RequestClans", new Action<long, ZPackage>(Client.RPC.RPC_RequestClans));
             ZRoutedRpc.instance.Register("ResponseClans", new Action<long, ZPackage>(Client.RPC.RPC_ResponseClans));
+            ZRoutedRpc.instance.Register("UpdateClans", new Action<long, ZPackage>(Client.RPC.RPC_UpdateClans));
             ZRoutedRpc.instance.Register("BadMessage", new Action<long, ZPackage>(Client.RPC.RPC_BadRequest));
         }
     }

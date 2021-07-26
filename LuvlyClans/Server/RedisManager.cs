@@ -21,14 +21,14 @@ namespace LuvlyClans.Server.Redis
 
         private RedisManager()
         {
-            Log.LogInfo("Initializing Redis connection");
+            Log.LogInfo("Initializing connection to Redis server");
 
             Connect(dataClientName);
             Connect(subClientName);
 
-            Log.LogInfo("Subscribing to Redis sync channel");
+            Log.LogInfo("Initializing pubsub to Redis sync channel");
 
-            SyncToSub();
+            SubToSync();
         }
 
         public static RedisManager GetInstance()
@@ -95,21 +95,33 @@ namespace LuvlyClans.Server.Redis
             }
         }
 
-        private void SyncToSub()
+        private void SubToSync()
         {
             if (redissub != null)
             {
-                redissub.GetSubscriber().Subscribe("sync", (channel, message) => SubHandler(channel, message));
+                redissub.GetSubscriber().Subscribe($"__keyspace@0:__:{LuvlyClans.redisMasterKey}", (channel, message) => SubHandler(channel, message));
             }
         }
 
         private static void SubHandler(RedisChannel channel, RedisValue message)
         {
-            if (channel == "sync")
+            if (channel == $"__keyspace@0:__:{LuvlyClans.redisMasterKey}")
             {
-                if (!message.IsNullOrEmpty)
+                if (!message.IsNullOrEmpty && message == "set")
                 {
                     Log.LogInfo($"Received Redis sync message:: {message}");
+
+                    if (message == "set")
+                    {
+                        LuvlyClans.clansman.Reload();
+
+                        LuvlyClans.clansman.UpdateServerString();
+
+                        ZPackage zpkg = new ZPackage();
+                        zpkg.Write(LuvlyClans.clansman.GetServerString());
+
+                        ZRoutedRpc.instance.InvokeRoutedRPC(0L, "ResponseClans", new object[] { zpkg });
+                    }
                 }
             }
         }
