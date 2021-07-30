@@ -184,7 +184,7 @@ namespace LuvlyClans
         {
             if (clan.clanMembers != null && clan.clanMembers.Length > 0)
             {
-                return Array.Exists(clan.clanMembers, (clanMember) => clanMember.playerID == clanMemberID);
+                return Array.Exists(clan.clanMembers, (clanMember) => Array.Exists(clanMember.playerIDs, (id) => id == clanMemberID));
             }
 
             return false;
@@ -242,7 +242,7 @@ namespace LuvlyClans
 
             if (clan != null)
             {
-                return Array.Find(clan.clanMembers, (clanMember) => clanMember.playerID == id);
+                return Array.Find(clan.clanMembers, (clanMember) => Array.Exists(clanMember.playerIDs, (pid) => pid == id));
             }
 
             return null;
@@ -264,8 +264,10 @@ namespace LuvlyClans
         {
             ClanMember member = new ClanMember();
 
+            List<long> pids = new List<long>() { pid };
+
             member.playerName = name;
-            member.playerID = pid;
+            member.playerIDs = pids.ToArray();
             member.playerSID = sid;
             member.playerRank = rank;
 

@@ -63,7 +63,16 @@ namespace LuvlyClans.Server
 
                             ClanMember member = LuvlyClans.clansman.GetClanMemberByName(playerName);
 
-                            member.playerID = playerID;
+                            List<long> pids = new List<long>();
+
+                            foreach (long id in member.playerIDs)
+                            {
+                                pids.Add(id);
+                            }
+
+                            pids.Add(playerID);
+
+                            member.playerIDs = pids.ToArray();
 
                             Log.LogWarning($"PlayerID now set for Player [{playerName}]");
                         }
