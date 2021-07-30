@@ -10,7 +10,6 @@ using HarmonyLib;
 using Jotunn;
 using Jotunn.Managers;
 using Jotunn.Utils;
-using LuvlyClans.Patches;
 using LuvlyClans.Server.Redis;
 using System;
 using Log = Jotunn.Logger;
@@ -31,6 +30,9 @@ namespace LuvlyClans
         public static string pathBepinex = BepInEx.Paths.ConfigPath;
         public const string pathJSON = "luvly.clans.json";
         public const string pathJSONBackup = "luvly.clans.old.json";
+
+        /** redis clans key */
+        public const string redisMasterKey = "clans";
 
         /** redis config */
         public static ConfigEntry<bool> redisEnabled;
@@ -63,15 +65,7 @@ namespace LuvlyClans
         {
             Log.LogInfo("Loading patches");
 
-            harmony.PatchAll(typeof(GamePatches));
-            harmony.PatchAll(typeof(ZNetPatches));
-            harmony.PatchAll(typeof(DoorPatches));
-            harmony.PatchAll(typeof(ContainerPatches));
-            harmony.PatchAll(typeof(MinimapPatches));
-            harmony.PatchAll(typeof(ShipControllsPatches));
-            harmony.PatchAll(typeof(TeleportWorldPatches));
-            harmony.PatchAll(typeof(CharacterPatches));
-            harmony.PatchAll(typeof(EnemyHudPatches));
+            harmony.PatchAll();
         }
 
         private void RedisConfigValues()

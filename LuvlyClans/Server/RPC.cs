@@ -1,4 +1,5 @@
 ﻿using Log = Jotunn.Logger;
+using LuvlyClans.Server.Commands;
 using LuvlyClans.Types;
 using System.Collections.Generic;
 
@@ -70,7 +71,7 @@ namespace LuvlyClans.Server
 
                     if (SYNC_FLAG)
                     {
-                        LuvlyClans.clansman.UpdateServerString();
+                        LuvlyClans.clansman.SyncRedisClans();
                     }
 
                     zpkg.Write(LuvlyClans.clansman.GetServerString());
@@ -90,6 +91,62 @@ namespace LuvlyClans.Server
             zpkg.Write("null package received");
 
             ZRoutedRpc.instance.InvokeRoutedRPC(sender, "BadRequest", new object[] { zpkg });
+        }
+
+        public static void RPC_UpdateClans(long sender, ZPackage pkg)
+        {
+            ZPackage zpkg = new ZPackage();
+
+            bool SYNC_FLAG = false; /** flag to sync all clients (including redis clients) */
+
+            if (pkg != null && pkg.Size() > 0)
+            {
+                Log.LogInfo("Server received request from peer");
+
+                ZNetPeer peer = ZNet.instance.GetPeer(sender);
+
+                if (peer != null)
+                {
+                    Log.LogInfo("Server received clans command from valid peer");
+
+                    string[] args = pkg.ReadString().Split(',');
+
+                    if (args.Length > 0)
+                    {
+                        switch (args[0])
+                        {
+                            case "join":
+                                ClanCommands.Join(args[1]);
+                                break;
+                            case "leave":
+                                ClanCommands.Leave(pkg.ReadString());
+                                break;
+                            case "add":
+                                ClanCommands.Add(args[1], args[2]);
+                                break;
+                            case "remove":
+                                ClanCommands.Remove(args[1], args[2]);
+                                break;
+                            case "create":
+                                ClanCommands.Create(args[1], args[2], !(args[3] == "0"));
+                                break;
+                            case "destroy":
+                                break;
+                        }
+
+                        SYNC_FLAG = true;
+                    }
+                }
+            }
+
+            if (SYNC_FLAG)
+            {
+                LuvlyClans.clansman.UpdateServerString();
+
+                zpkg.Write(LuvlyClans.clansman.GetServerString());
+
+                ZRoutedRpc.instance.InvokeRoutedRPC(0L, "ResponseClans", new object[] { zpkg });
+            }
         }
 
         public static void RPC_ResponseClans(long sender, ZPackage pkg)

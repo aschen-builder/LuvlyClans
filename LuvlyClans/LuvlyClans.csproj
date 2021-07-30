@@ -132,6 +132,7 @@
     <Compile Include="ClansManager.cs" />
     <Compile Include="Client\RPC.cs" />
     <Compile Include="Patches\CharacterPatches.cs" />
+    <Compile Include="Patches\ChatPatches.cs" />
     <Compile Include="Patches\ContainerPatches.cs" />
     <Compile Include="Patches\DoorPatches.cs" />
     <Compile Include="Patches\EnemyHudPatches.cs" />
@@ -143,6 +144,7 @@
     <Compile Include="Properties\IgnoreAccessModifiers.cs" />
     <Compile Include="LuvlyClans.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Server\Commands\ClanCommands.cs" />
     <Compile Include="Server\RedisManager.cs" />
     <Compile Include="Server\RPC.cs" />
     <Compile Include="Types\Clans.cs" />

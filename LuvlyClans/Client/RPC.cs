@@ -11,6 +11,11 @@ namespace LuvlyClans.Client
             return;
         }
 
+        public static void RPC_UpdateClans(long sender, ZPackage pkg)
+        {
+            return;
+        }
+
         public static void RPC_ResponseClans(long sender, ZPackage pkg)
         {
             Log.LogInfo("Receiving message from server");

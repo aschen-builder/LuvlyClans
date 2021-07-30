@@ -2,6 +2,7 @@
 using Log = Jotunn.Logger;
 using LuvlyClans.Types;
 using System;
+using System.Collections.Generic;
 
 namespace LuvlyClans
 {
@@ -19,11 +20,16 @@ namespace LuvlyClans
 
         private ClansManager()
         {
+            Reload();
+        }
+
+        public void Reload()
+        {
             if (LuvlyClans.isServer)
             {
                 if (LuvlyClans.redisman != null)
                 {
-                    redisString = LuvlyClans.redisman.GetDatabase().StringGet("clans");
+                    redisString = LuvlyClans.redisman.GetDatabase().StringGet(LuvlyClans.redisMasterKey);
 
                     if (redisString != null)
                     {
@@ -136,7 +142,7 @@ namespace LuvlyClans
 
         public bool ClansHasClanByName(string name)
         {
-            if (serverClans.clans != null && serverClans.clans.Length > 0)
+            if (serverClans != null && serverClans.clans != null && serverClans.clans.Length > 0)
             {
                 return Array.Exists(serverClans.clans, (clan) => clan.clanName == name);
             }
@@ -146,7 +152,7 @@ namespace LuvlyClans
 
         public bool ClansHasClanMemberByName(string name)
         {
-            if (serverClans.clans != null && serverClans.clans.Length > 0)
+            if (serverClans != null && serverClans.clans != null && serverClans.clans.Length > 0)
             {
                 Array.Exists(serverClans.clans, (clan) => ClanHasClanMemberByName(clan, name));
             }
@@ -166,7 +172,7 @@ namespace LuvlyClans
 
         public bool ClansHasClanMemberByID(long id)
         {
-            if (serverClans.clans != null && serverClans.clans.Length > 0)
+            if (serverClans != null && serverClans.clans != null && serverClans.clans.Length > 0)
             {
                 Array.Exists(serverClans.clans, (clan) => ClanHasClanMemberByID(clan, id));
             }
@@ -266,6 +272,78 @@ namespace LuvlyClans
             return member;
         }
 
+        public void AddNewClanToClans(Clan clan)
+        {
+            List<Clan> newClans = new List<Clan>();
+
+            if (serverClans.clans != null)
+            {
+                for (int i = 0; i < serverClans.clans.Length; i++)
+                {
+                    newClans.Add(serverClans.clans[i]);
+                }
+            }
+
+            newClans.Add(clan);
+
+            serverClans.clans = newClans.ToArray();
+
+            SyncRedisClans();
+        }
+
+        public void AddNewClanMemberToClan(Clan clan, ClanMember clanMember)
+        {
+            List<ClanMember> newMembers = new List<ClanMember>();
+
+            if (clan.clanMembers != null)
+            {
+                for (int i = 0; i < clan.clanMembers.Length; i++)
+                {
+                    newMembers.Add(clan.clanMembers[i]);
+                }
+            }
+
+            newMembers.Add(clanMember);
+
+            clan.clanMembers = newMembers.ToArray();
+
+            SyncRedisClans();
+        }
+
+        public void KickClanMember(string name)
+        {
+            Clan clan = GetClanByClanMemberName(name);
+            ClanMember oldMember = CreateClanMember(name);
+
+            if (clan != null && clan.clanName != "Wildlings")
+            {
+                List<ClanMember> newMembers = new List<ClanMember>();
+
+                foreach (ClanMember member in clan.clanMembers)
+                {
+                    if (member.playerName != name)
+                    {
+                        newMembers.Add(member);
+                    }
+                    else
+                    {
+                        oldMember = member;
+                    }
+                }
+
+                clan.clanMembers = newMembers.ToArray();
+
+                Clan wildlingsClan = GetClanByName("Wildlings");
+
+                if (wildlingsClan != null)
+                {
+                    AddNewClanMemberToClan(wildlingsClan, oldMember);
+                }
+
+                SyncRedisClans();
+            }
+        }
+
         public bool IsSameClanByClanMemberName(string nameA, string nameB)
         {
             Clan clanA = GetClanByClanMemberName(nameA);
@@ -290,6 +368,17 @@ namespace LuvlyClans
             }
 
             return false;
+        }
+
+        public void SyncRedisClans()
+        {
+            UpdateServerString();
+
+            redisString = serverString;
+
+            LuvlyClans.redisman.GetDatabase().StringSet("clans", redisString);
+
+            /** need to pub to sync channel */
         }
     }
 }
