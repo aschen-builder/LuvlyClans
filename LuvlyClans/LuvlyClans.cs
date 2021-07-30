@@ -10,7 +10,7 @@ using HarmonyLib;
 using Jotunn;
 using Jotunn.Managers;
 using Jotunn.Utils;
-
+using LuvlyClans.Server.Utils;
 using Log = Jotunn.Logger;
 
 namespace LuvlyClans
@@ -34,6 +34,12 @@ namespace LuvlyClans
         public static ConfigEntry<int> redisPort;
         public static ConfigEntry<string> redisPass;
         public static ConfigEntry<int> redisDB;
+
+        /** redis manager */
+        public static RedisManager redisMan;
+
+        /** clans manager */
+        public static ClansManager clansMan;
 
         private void Awake()
         {
