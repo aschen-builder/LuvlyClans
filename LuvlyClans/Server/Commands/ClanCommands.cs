@@ -1,5 +1,6 @@
 ﻿using LuvlyClans.Types;
 using System;
+using System.Collections.Generic;
 
 namespace LuvlyClans.Server.Commands
 {
@@ -20,10 +21,29 @@ namespace LuvlyClans.Server.Commands
 
                     if (clan.isPublic)
                     {
+                        bool oldMemberExists = LuvlyClans.clansman.ClansHasClanMemberByName(Player.m_localPlayer.GetPlayerName());
+
+                        List<long> pids = new List<long>();
+
+                        if (oldMemberExists)
+                        {
+                            foreach (long id in LuvlyClans.clansman.GetClanMemberByName(Player.m_localPlayer.GetPlayerName()).playerIDs)
+                            {
+                                pids.Add(id);
+                            }
+
+
+                        }
+
+                        if (!pids.Contains(Player.m_localPlayer.GetPlayerID()))
+                        {
+                            pids.Add(Player.m_localPlayer.GetPlayerID());
+                        }
+
                         ClanMember member = new ClanMember
                         {
                             playerName = Player.m_localPlayer.GetPlayerName(),
-                            playerID = Player.m_localPlayer.GetPlayerID(),
+                            playerIDs = pids.ToArray(),
                             playerRank = 4
                         };
 

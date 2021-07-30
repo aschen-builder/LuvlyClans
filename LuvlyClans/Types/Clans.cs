@@ -3,7 +3,7 @@
     public class ClanMember
     {
         public string playerName { get; set; }
-        public long playerID { get; set; }
+        public long[] playerIDs { get; set; }
         public long playerSID { get; set; }
         public int playerRank { get; set; }
     }
